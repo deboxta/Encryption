@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Substitution Cypher</string>
+
+    <string name="hint_input_text">Tap to input some text</string>
+    <string name="text_encrypt">Encrypt</string>
+    <string name="text_decrypt">Decrypt</string>
+    <string name="hint_output_text">Result will be shown here</string>
+    <string name="text_current_key">Key : %05d</string>
+    <string name="text_copy">Copy</string>
+
+    <string name="text_connectivity_error">You are not connected to the internet.</string>
+    <string name="text_server_error">Server is in maintenance. Please try again later.</string>
+    <string name="text_copied_output">Copied!</string>
+
+    <string name="text_activate_wifi">Activate Wifi</string>
+
+    <string name="clipboard_encrypted_text">Encrypted text</string>
+</resources>
