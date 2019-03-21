@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
@@ -30,12 +31,14 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
     private OkHttpClient okHttpClient;
     private ObjectMapper objectMapper;
+    private Intent intent;
 
     private View rootView;
     private EditText inputEditText;
     private TextView outputTextView;
     private Button encryptButton;
     private Button decryptButton;
+    private FloatingActionButton selectKeyButton;
     private TextView currentKeyTextView;
     private ProgressBar progressBar;
 
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         createView();
         createDependencies();
 
-        Intent intent = getIntent();
+        intent = getIntent();
         if("text/plain".equals(intent.getType())) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
         }
@@ -67,7 +70,10 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         outputTextView = findViewById(R.id.outputTextView);
         encryptButton = findViewById(R.id.encryptButton);
         decryptButton = findViewById(R.id.decryptButton);
+        selectKeyButton = findViewById(R.id.selectKeyButton);
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
+
+        selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
     }
 
     @Override
@@ -79,13 +85,26 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         task.execute();
     }
 
+    private void onSelectKeyButtonPressed(View view){
+        openKeyPickerDialog();
+    }
+
     private void openKeyPickerDialog() {
         //TODO : Compléter la création et l'ouverture du "KeyPickerDialog" dans cette fonction.
         KeyPickerDialog.make(this, KEY_LENGTH)
-                //.setKey(1337)
-                //.setConfirmAction(this::theConfirmFunctionToCall)
-                //.setCancelAction(this::theCancelFunctionToCall)
+                .setKey(1337)
+                .setConfirmAction(this::theConfirmFunctionToCall)
+                .setCancelAction(this::theCancelFunctionToCall)
                 .show();
+    }
+
+    private void theConfirmFunctionToCall(int i) {
+        //TODO: transferrer la nouvelle cle
+    }
+
+    private void theCancelFunctionToCall() {
+        if (intent.getExtras() != null)
+            finish();
     }
 
     @SuppressWarnings("ConstantConditions")
