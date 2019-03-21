@@ -3,7 +3,9 @@ package ca.csf.mobile1.tp2.activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.view.View;
@@ -17,9 +19,11 @@ import ca.csf.mobile1.util.view.KeyPickerDialog;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 
+import java.util.List;
+
 import static org.koin.java.standalone.KoinJavaComponent.get;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FetchPostAsyncTask.Listener{
 
     private static final int KEY_LENGTH = 5;
     private static final int MAX_KEY_VALUE = (int) Math.pow(10, KEY_LENGTH) - 1;
@@ -41,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
         createView();
         createDependencies();
+
+        Intent intent = getIntent();
+        if("text/plain".equals(intent.getType())) {
+            inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
+        }
     }
 
     private void createDependencies() {
@@ -61,6 +70,15 @@ public class MainActivity extends AppCompatActivity {
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError);
+
+        task.execute();
+    }
+
     private void openKeyPickerDialog() {
         //TODO : Compléter la création et l'ouverture du "KeyPickerDialog" dans cette fonction.
         KeyPickerDialog.make(this, KEY_LENGTH)
@@ -76,4 +94,27 @@ public class MainActivity extends AppCompatActivity {
         clipboard.setPrimaryClip(ClipData.newPlainText(getResources().getString(R.string.clipboard_encrypted_text), text));
     }
 
+    private void onNotFoundError(){
+        Snackbar.make(rootView,"Not found error!", Snackbar.LENGTH_LONG).show();            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+    }
+
+    private void onConnectivityError(){
+        Snackbar.make(rootView,"Connectivity error!", Snackbar.LENGTH_INDEFINITE).setAction("Retry", this::fetchPosts);            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+    }
+
+    private void fetchPosts(View view){
+
+        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError);
+
+        task.execute();
+    }
+
+    private void onServerError(){
+        Snackbar.make(rootView,"Server error!", Snackbar.LENGTH_LONG).show();            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+    }
+
+    @Override
+    public void onPostFetched(String post) {
+
+    }
 }
