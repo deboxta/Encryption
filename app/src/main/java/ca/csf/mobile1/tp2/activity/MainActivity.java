@@ -20,6 +20,7 @@ import ca.csf.mobile1.util.view.KeyPickerDialog;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.koin.java.standalone.KoinJavaComponent.get;
@@ -49,9 +50,15 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         createView();
         createDependencies();
 
+        selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
+        encryptButton.setEnabled(false);
+        decryptButton.setEnabled(false);
+        currentKeyTextView.setText("");
+
         intent = getIntent();
         if("text/plain".equals(intent.getType())) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
+            openKeyPickerDialog();
         }
     }
 
@@ -72,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         decryptButton = findViewById(R.id.decryptButton);
         selectKeyButton = findViewById(R.id.selectKeyButton);
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
-
-        selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
     }
 
     @Override
@@ -98,12 +103,14 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
                 .show();
     }
 
-    private void theConfirmFunctionToCall(int i) {
-        //TODO: transferrer la nouvelle cle
+    private void theConfirmFunctionToCall(Integer i ) {
+        currentKeyTextView.setText(i.toString());
+        decryptButton.setEnabled(true);
+        encryptButton.setEnabled(true);
     }
 
     private void theCancelFunctionToCall() {
-        if (intent.getExtras() != null)
+        if (intent.getType() != null && currentKeyTextView.getText().equals(""))
             finish();
     }
 
@@ -114,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void onNotFoundError(){
-        Snackbar.make(rootView,"Not found error!", Snackbar.LENGTH_LONG).show();            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+        Snackbar.make(rootView,R.string.error_not_found, Snackbar.LENGTH_LONG).show();
     }
 
     private void onConnectivityError(){
-        Snackbar.make(rootView,"Connectivity error!", Snackbar.LENGTH_INDEFINITE).setAction("Retry", this::fetchPosts);            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+        Snackbar.make(rootView,R.string.error_connectivity, Snackbar.LENGTH_INDEFINITE).setAction("Retry", this::fetchPosts);
     }
 
     private void fetchPosts(View view){
@@ -129,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void onServerError(){
-        Snackbar.make(rootView,"Server error!", Snackbar.LENGTH_LONG).show();            //TODO: mettre une constante ou bien une string dans le fichier strings pour les options multilangues
+        Snackbar.make(rootView,R.string.error_server, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
