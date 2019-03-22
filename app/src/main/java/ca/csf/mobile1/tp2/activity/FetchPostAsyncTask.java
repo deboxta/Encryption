@@ -11,31 +11,38 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.security.PrivilegedAction;
 import java.util.List;
 
-public class FetchPostAsyncTask extends AsyncTask<Void, Void, String> {
+public class FetchPostAsyncTask extends AsyncTask<String, Void, List<Task>> {
 
-    private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/";
+    private static final String POST_HTTP = "http://192.168.1.15:8080/api/v1/key/"; //https://m1t2.blemelin.tk/api/v1/key/
 
     private boolean isServerError;
     private boolean isNotFoundError;
     private boolean isConnnectivityError;
+
+    private OkHttpClient okHttpClient;
+    private ObjectMapper objectMapper;
 
     private final Listener onSuccess;
     private final Runnable onNotFoundError;
     private final Runnable onConnectivityError;
     private final Runnable onServerError;
 
-    public FetchPostAsyncTask(Listener onSuccess, Runnable onNotFoundError, Runnable onConnectivityError, Runnable onServerError) {
+    public FetchPostAsyncTask(Listener onSuccess, Runnable onNotFoundError, Runnable onConnectivityError, Runnable onServerError, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
 
         if (onSuccess == null) throw new IllegalArgumentException("onSuccess cannot be null");
-        if (onNotFoundError == null) throw new IllegalArgumentException("onSuccess cannot be null");
-        if (onConnectivityError == null) throw new IllegalArgumentException("onSuccess cannot be null");
-        if (onServerError == null) throw new IllegalArgumentException("onSuccess cannot be null");
+        if (onNotFoundError == null) throw new IllegalArgumentException("onNotFoundError cannot be null");
+        if (onConnectivityError == null) throw new IllegalArgumentException("onConnectivityError cannot be null");
+        if (onServerError == null) throw new IllegalArgumentException("onServerError cannot be null");
 
         isServerError = false;
         isNotFoundError = false;
         isConnnectivityError = false;
+
+        this.okHttpClient = okHttpClient;
+        this.objectMapper =objectMapper;
 
         this.onSuccess = onSuccess;
         this.onNotFoundError = onNotFoundError;
@@ -44,13 +51,14 @@ public class FetchPostAsyncTask extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected String doInBackground(Void... voids) {              //TODO : CHANGE LE LIST<STRING> POUR LISTE DE POST
-        OkHttpClient client = new OkHttpClient();
+    protected List<Task> doInBackground(String... key) {              //TODO : CHANGE LE LIST<STRING> POUR LISTE DE POST
+        if(android.os.Debug.isDebuggerConnected())
+            android.os.Debug.waitForDebugger();
 
-        Request request = new Request.Builder().url(POST_HTTP).build();
+        Request request = new Request.Builder().url(POST_HTTP+key[0]).build();
 
-        String post = null; //TODO: CHANGE LE NOM POUR QUIL SOIT PLUS PRECIS
-        try(Response response = client.newCall(request).execute()) {
+        List<Task> post = null; //TODO: CHANGE LE NOM POUR QUIL SOIT PLUS PRECIS
+        try(Response response = okHttpClient.newCall(request).execute()) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND){
                 isNotFoundError = true;
             }else if (!response.isSuccessful()){
@@ -58,19 +66,20 @@ public class FetchPostAsyncTask extends AsyncTask<Void, Void, String> {
             }else{
                 String responseBody = response.body().string();
 
-                ObjectMapper mapper = new ObjectMapper();
-                post = mapper.readValue(responseBody, new TypeReference<String>(){});
+                post = objectMapper.readValue(responseBody, new TypeReference<Task>(){});
             }
         } catch (JsonParseException | JsonMappingException e){
+            e.printStackTrace();
             isServerError = true;
         } catch (IOException e){
+            e.printStackTrace();
             isConnnectivityError = true;
         }
-//        response.close();
         return post;
     }
 
-    public void onPostExecute(String post){
+    @Override
+    protected void onPostExecute(List<Task> post) {
         if (isServerError)
             onServerError.run();
         else if (isConnnectivityError)
@@ -82,7 +91,6 @@ public class FetchPostAsyncTask extends AsyncTask<Void, Void, String> {
     }
 
     public interface Listener{
-        void onPostFetched(String post);
+        void onPostFetched(List<Task> post);
     }
-
 }

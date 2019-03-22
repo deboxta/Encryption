@@ -5,15 +5,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import ca.csf.mobile1.tp2.R;
 import ca.csf.mobile1.util.view.CharactersFilter;
 import ca.csf.mobile1.util.view.KeyPickerDialog;
@@ -22,6 +21,7 @@ import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import static org.koin.java.standalone.KoinJavaComponent.get;
 
@@ -34,11 +34,15 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     private ObjectMapper objectMapper;
     private Intent intent;
 
+    private Integer key;
+    private Random rand;
+
     private View rootView;
     private EditText inputEditText;
     private TextView outputTextView;
     private Button encryptButton;
     private Button decryptButton;
+    private ImageButton copyButton;
     private FloatingActionButton selectKeyButton;
     private TextView currentKeyTextView;
     private ProgressBar progressBar;
@@ -51,9 +55,12 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         createDependencies();
 
         selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
+        copyButton.setOnClickListener(this::onCopyButtonPressed);
+        encryptButton.setOnClickListener(this::onEncryptButtonPressed);
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
-        currentKeyTextView.setText("");
+        rand = new Random();
+        key = rand.nextInt(MAX_KEY_VALUE);
 
         intent = getIntent();
         if("text/plain".equals(intent.getType())) {
@@ -78,33 +85,43 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         encryptButton = findViewById(R.id.encryptButton);
         decryptButton = findViewById(R.id.decryptButton);
         selectKeyButton = findViewById(R.id.selectKeyButton);
+        copyButton = findViewById(R.id.copyButton);
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError);
-
-        task.execute();
     }
 
     private void onSelectKeyButtonPressed(View view){
         openKeyPickerDialog();
     }
 
+    private void onCopyButtonPressed(View view) {
+        putTextInClipboard(outputTextView.getText().toString());
+        Snackbar.make(rootView,R.string.text_copied_output, BaseTransientBottomBar.LENGTH_LONG).show();
+    }
+
+    private void onEncryptButtonPressed(View view) {
+        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
+
+        task.execute(key.toString());
+    }
+
     private void openKeyPickerDialog() {
         //TODO : Compléter la création et l'ouverture du "KeyPickerDialog" dans cette fonction.
         KeyPickerDialog.make(this, KEY_LENGTH)
-                .setKey(1337)
+                .setKey(key)
                 .setConfirmAction(this::theConfirmFunctionToCall)
                 .setCancelAction(this::theCancelFunctionToCall)
                 .show();
     }
 
-    private void theConfirmFunctionToCall(Integer i ) {
-        currentKeyTextView.setText(i.toString());
+    private void theConfirmFunctionToCall(Integer key) {
+        this.key = key;
+        putKeyOnCurrentKeyTextView(key);
+
         decryptButton.setEnabled(true);
         encryptButton.setEnabled(true);
     }
@@ -112,6 +129,11 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     private void theCancelFunctionToCall() {
         if (intent.getType() != null && currentKeyTextView.getText().equals(""))
             finish();
+    }
+
+    private void putKeyOnCurrentKeyTextView(Integer key){
+        currentKeyTextView.setText(R.string.text_current_key);
+        currentKeyTextView.setText(currentKeyTextView.getText().toString().replace("%05d",key.toString()));
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -124,23 +146,18 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         Snackbar.make(rootView,R.string.error_not_found, Snackbar.LENGTH_LONG).show();
     }
 
-    private void onConnectivityError(){
-        Snackbar.make(rootView,R.string.error_connectivity, Snackbar.LENGTH_INDEFINITE).setAction("Retry", this::fetchPosts);
-    }
+    private void onConnectivityError(){ Snackbar.make(rootView,R.string.text_connectivity_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.text_activate_wifi, this::activateWifi).show(); }
 
-    private void fetchPosts(View view){
-
-        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError);
-
-        task.execute();
+    private void activateWifi(View view){
+        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
     }
 
     private void onServerError(){
-        Snackbar.make(rootView,R.string.error_server, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(rootView,R.string.text_server_error, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void onPostFetched(String post) {
+    public void onPostFetched(List<Task> post) {
 
     }
 }

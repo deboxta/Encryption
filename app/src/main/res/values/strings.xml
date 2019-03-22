@@ -10,13 +10,10 @@
 
     <string name="text_connectivity_error">You are not connected to the internet.</string>
     <string name="text_server_error">Server is in maintenance. Please try again later.</string>
+    <string name="error_not_found">Page not found</string>
     <string name="text_copied_output">Copied!</string>
 
     <string name="text_activate_wifi">Activate Wifi</string>
 
     <string name="clipboard_encrypted_text">Encrypted text</string>
-
-    <string name="error_connectivity">No connection to internet</string>
-    <string name="error_not_found">Page not found</string>
-    <string name="error_server">Server error</string>
 </resources>
