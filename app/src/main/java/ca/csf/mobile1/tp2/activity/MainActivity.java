@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
     private Integer key;
     private Random rand;
+    private String inputCharacters;
+    private String outputCharacters;
 
     private View rootView;
     private EditText inputEditText;
@@ -53,20 +55,27 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
         createView();
         createDependencies();
+        setVariables();
 
-        selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
-        copyButton.setOnClickListener(this::onCopyButtonPressed);
-        encryptButton.setOnClickListener(this::onEncryptButtonPressed);
-        encryptButton.setEnabled(false);
-        decryptButton.setEnabled(false);
         rand = new Random();
         key = rand.nextInt(MAX_KEY_VALUE);
+        inputCharacters = null;
+        outputCharacters = null;
 
         intent = getIntent();
         if("text/plain".equals(intent.getType())) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
             openKeyPickerDialog();
         }
+    }
+
+    private void setVariables(){
+        selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
+        copyButton.setOnClickListener(this::onCopyButtonPressed);
+        encryptButton.setOnClickListener(this::onEncryptButtonPressed);
+        encryptButton.setEnabled(false);
+        decryptButton.setEnabled(false);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private void createDependencies() {
@@ -89,11 +98,6 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
     private void onSelectKeyButtonPressed(View view){
         openKeyPickerDialog();
     }
@@ -104,9 +108,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void onEncryptButtonPressed(View view) {
-        FetchPostAsyncTask task = new FetchPostAsyncTask(this::onPostFetched, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
-        task.execute(key.toString());
     }
 
     private void openKeyPickerDialog() {
@@ -119,7 +121,12 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void theConfirmFunctionToCall(Integer key) {
+        FetchPostAsyncTask task = new FetchPostAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
+
+        task.execute(key.toString());
+
         this.key = key;
+
         putKeyOnCurrentKeyTextView(key);
 
         decryptButton.setEnabled(true);
@@ -148,16 +155,23 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
     private void onConnectivityError(){ Snackbar.make(rootView,R.string.text_connectivity_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.text_activate_wifi, this::activateWifi).show(); }
 
-    private void activateWifi(View view){
-        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-    }
-
     private void onServerError(){
         Snackbar.make(rootView,R.string.text_server_error, Snackbar.LENGTH_LONG).show();
     }
 
-    @Override
-    public void onPostFetched(List<Task> post) {
-
+    private void activateWifi(View view){
+        progressBar.setVisibility(View.INVISIBLE);
+        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
     }
+
+    @Override
+    public void onPostFetched(Task postKeyInfo) {
+        progressBar.setVisibility(View.INVISIBLE);
+        inputCharacters = postKeyInfo.getInputCharacters();
+        outputCharacters = postKeyInfo.getOutputCharacters();
+        key = postKeyInfo.getId();
+    }
+
+    @Override
+    public void onPostFetching() { progressBar.setVisibility(View.VISIBLE); }
 }

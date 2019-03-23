@@ -14,13 +14,13 @@ import java.net.HttpURLConnection;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-public class FetchPostAsyncTask extends AsyncTask<String, Void, List<Task>> {
+public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
 
-    private static final String POST_HTTP = "http://192.168.1.15:8080/api/v1/key/"; //https://m1t2.blemelin.tk/api/v1/key/
+    private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/"; //http://192.168.1.15:8080/api/v1/key/
 
     private boolean isServerError;
     private boolean isNotFoundError;
-    private boolean isConnnectivityError;
+    private boolean isConnectivityError;
 
     private OkHttpClient okHttpClient;
     private ObjectMapper objectMapper;
@@ -39,7 +39,7 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, List<Task>> {
 
         isServerError = false;
         isNotFoundError = false;
-        isConnnectivityError = false;
+        isConnectivityError = false;
 
         this.okHttpClient = okHttpClient;
         this.objectMapper =objectMapper;
@@ -51,13 +51,13 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, List<Task>> {
     }
 
     @Override
-    protected List<Task> doInBackground(String... key) {              //TODO : CHANGE LE LIST<STRING> POUR LISTE DE POST
+    protected Task doInBackground(String... key) {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
 
         Request request = new Request.Builder().url(POST_HTTP+key[0]).build();
 
-        List<Task> post = null; //TODO: CHANGE LE NOM POUR QUIL SOIT PLUS PRECIS
+        Task postKeyInfo = null;
         try(Response response = okHttpClient.newCall(request).execute()) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND){
                 isNotFoundError = true;
@@ -66,31 +66,35 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, List<Task>> {
             }else{
                 String responseBody = response.body().string();
 
-                post = objectMapper.readValue(responseBody, new TypeReference<Task>(){});
+                postKeyInfo = objectMapper.readValue(responseBody, Task.class);
             }
         } catch (JsonParseException | JsonMappingException e){
             e.printStackTrace();
             isServerError = true;
         } catch (IOException e){
             e.printStackTrace();
-            isConnnectivityError = true;
+            isConnectivityError = true;
         }
-        return post;
+        return postKeyInfo;
     }
 
     @Override
-    protected void onPostExecute(List<Task> post) {
+    protected void onPreExecute() { onSuccess.onPostFetching(); }
+
+    @Override
+    protected void onPostExecute(Task postKeyInfo) {
         if (isServerError)
             onServerError.run();
-        else if (isConnnectivityError)
+        else if (isConnectivityError)
             onConnectivityError.run();
         else if (isNotFoundError)
             onNotFoundError.run();
-
-        onSuccess.onPostFetched(post);
+        else
+            onSuccess.onPostFetched(postKeyInfo);
     }
 
     public interface Listener{
-        void onPostFetched(List<Task> post);
+        void onPostFetched(Task postKeyInfo);
+        void onPostFetching();
     }
 }
