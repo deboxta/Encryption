@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
         copyButton.setOnClickListener(this::onCopyButtonPressed);
         encryptButton.setOnClickListener(this::onEncryptButtonPressed);
+        decryptButton.setOnClickListener(this::onDecryptButtonPressed);
         encryptButton.setEnabled(false);
         decryptButton.setEnabled(false);
         progressBar.setVisibility(View.INVISIBLE);
@@ -108,7 +109,11 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void onEncryptButtonPressed(View view) {
+        outputTextView.setText(encrypt(inputEditText.getText().toString(), inputCharacters, outputCharacters));
+    }
 
+    private void onDecryptButtonPressed(View view) {
+        outputTextView.setText(decrypt(inputEditText.getText().toString(), inputCharacters, outputCharacters));
     }
 
     private void openKeyPickerDialog() {
@@ -174,4 +179,47 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
     @Override
     public void onPostFetching() { progressBar.setVisibility(View.VISIBLE); }
+
+
+    /**
+     *
+     * @param userString Le string que l'utilisateur a entré
+     * @param inputCharacters Le string qui sert à déterminer quelle est la position d'un charactère
+     * @param outputCharacters Le string qui sert à remplacer des charactère selon leur position
+     * @return Retourne un string encrypté
+     */
+    private StringBuilder encrypt(String userString , String inputCharacters, String outputCharacters)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < userString.length(); i++)
+        {
+            Character currentCharacter = userString.charAt(i);
+
+            stringBuilder.append(outputCharacters.substring(inputCharacters.indexOf(currentCharacter), inputCharacters.indexOf(currentCharacter) + 1));
+        }
+
+        return stringBuilder;
+    }
+
+    /**
+     *
+     * @param userString Le string que l'utilisateur a entré
+     * @param inputCharacters Le string qui sert à déterminer quelle est la position d'un charactère
+     * @param outputCharacters Le string qui sert à remplacer des charactère selon leur position
+     * @return Retourne un string décrypté
+     */
+    private StringBuilder decrypt(String userString , String inputCharacters, String outputCharacters)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < userString.length(); i++)
+        {
+            Character currentCharacter = userString.charAt(i);
+
+            stringBuilder.append(inputCharacters.substring(outputCharacters.indexOf(currentCharacter), outputCharacters.indexOf(currentCharacter) + 1));
+        }
+
+        return stringBuilder;
+    }
 }

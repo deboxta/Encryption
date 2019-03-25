@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
 
-    private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/"; //http://192.168.1.15:8080/api/v1/key/
+    private static final String POST_HTTP = /*"https://m1t2.blemelin.tk/api/v1/key/";*/ /*http://192.168.1.15:8080/api/v1/key/*/ "http://10.17.60.75:8080/api/v1/key/";
 
     private boolean isServerError;
     private boolean isNotFoundError;
