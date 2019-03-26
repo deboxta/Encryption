@@ -1,7 +1,7 @@
 package ca.csf.mobile1.tp2.activity;
 
 
-public class Task {
+public class KeyFromServer {
     private int id;
     private String inputCharacters;
     private String  outputCharacters;
