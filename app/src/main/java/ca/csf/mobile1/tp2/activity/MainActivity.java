@@ -126,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void theConfirmFunctionToCall(Integer key) {
-        FetchPostAsyncTask task = new FetchPostAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
+        FetchPostAsyncTask taskGetKey = new FetchPostAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
-        task.execute(key.toString());
+        taskGetKey.execute(key.toString());
 
         this.key = key;
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     @Override
-    public void onPostFetched(Task postKeyInfo) {
+    public void onPostFetched(KeyFromServer postKeyInfo) {
         progressBar.setVisibility(View.INVISIBLE);
         inputCharacters = postKeyInfo.getInputCharacters();
         outputCharacters = postKeyInfo.getOutputCharacters();

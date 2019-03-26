@@ -1,6 +1,7 @@
 package ca.csf.mobile1.tp2.activity;
 
 import android.os.AsyncTask;
+import android.os.AsyncTask;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -14,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
+    public class FetchPostAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
 
     private static final String POST_HTTP = /*"https://m1t2.blemelin.tk/api/v1/key/";*/ /*http://192.168.1.15:8080/api/v1/key/*/ "http://10.17.60.75:8080/api/v1/key/";
 
@@ -51,13 +52,13 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
     }
 
     @Override
-    protected Task doInBackground(String... key) {
+    protected KeyFromServer doInBackground(String... key) {
         if(android.os.Debug.isDebuggerConnected())
             android.os.Debug.waitForDebugger();
 
         Request request = new Request.Builder().url(POST_HTTP+key[0]).build();
 
-        Task postKeyInfo = null;
+        KeyFromServer postKeyInfo = null;
         try(Response response = okHttpClient.newCall(request).execute()) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND){
                 isNotFoundError = true;
@@ -66,7 +67,7 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
             }else{
                 String responseBody = response.body().string();
 
-                postKeyInfo = objectMapper.readValue(responseBody, Task.class);
+                postKeyInfo = objectMapper.readValue(responseBody, KeyFromServer.class);
             }
         } catch (JsonParseException | JsonMappingException e){
             e.printStackTrace();
@@ -82,7 +83,7 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
     protected void onPreExecute() { onSuccess.onPostFetching(); }
 
     @Override
-    protected void onPostExecute(Task postKeyInfo) {
+    protected void onPostExecute(KeyFromServer postKeyInfo) {
         if (isServerError)
             onServerError.run();
         else if (isConnectivityError)
@@ -94,7 +95,7 @@ public class FetchPostAsyncTask extends AsyncTask<String, Void, Task> {
     }
 
     public interface Listener{
-        void onPostFetched(Task postKeyInfo);
+        void onPostFetched(KeyFromServer postKeyInfo);
         void onPostFetching();
     }
 }
