@@ -25,7 +25,7 @@ import java.util.Random;
 
 import static org.koin.java.standalone.KoinJavaComponent.get;
 
-public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask.Listener{
+public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask.Listener, EncryptTask.Listener, DecryptTask.Listener{
 
     private static final int KEY_LENGTH = 5;
     private static final int MAX_KEY_VALUE = (int) Math.pow(10, KEY_LENGTH) - 1;
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         currentKeyTextView = findViewById(R.id.currentKeyTextView);
     }
 
-
     private void onSelectKeyButtonPressed(View view){
         openKeyPickerDialog();
     }
@@ -142,11 +141,19 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     private void onEncryptButtonPressed(View view) {
-        outputTextView.setText(encrypt(inputEditText.getText().toString(), inputCharacters, outputCharacters));
+        EncryptTask encrypt = new EncryptTask(this, inputEditText.getText().toString(), inputCharacters, outputCharacters);
+
+        encrypt.execute(inputEditText.getText().toString());
+
+        outputTextView.setText(encrypt.doInBackground());
     }
 
     private void onDecryptButtonPressed(View view) {
-        outputTextView.setText(decrypt(inputEditText.getText().toString(), inputCharacters, outputCharacters));
+        DecryptTask decrypt = new DecryptTask(this, inputEditText.getText().toString(), inputCharacters, outputCharacters);
+
+        decrypt.execute(inputEditText.getText().toString());
+
+        outputTextView.setText(decrypt.doInBackground());
     }
 
     /**
@@ -171,9 +178,9 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
 
         taskGetKey.execute(key.toString());
 
-        putKeyOnCurrentKeyTextView(key);
-
         this.key = key;
+
+        putKeyOnCurrentKeyTextView(key);
 
         decryptButton.setEnabled(true);
         encryptButton.setEnabled(true);
@@ -232,46 +239,24 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     @Override
     public void onPostFetching() { progressBar.setVisibility(View.VISIBLE); }
 
-
-    /**
-     *
-     * @param userString Le string que l'utilisateur a entré
-     * @param inputCharacters Le string qui sert à déterminer quelle est la position d'un charactère
-     * @param outputCharacters Le string qui sert à remplacer des charactère selon leur position
-     * @return Retourne un string encrypté
-     */
-    private StringBuilder encrypt(String userString , String inputCharacters, String outputCharacters)
+    @Override
+    public void onEncrypted(StringBuilder encrypted)
     {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (int i = 0; i < userString.length(); i++)
-        {
-            Character currentCharacter = userString.charAt(i);
-
-            stringBuilder.append(outputCharacters.substring(inputCharacters.indexOf(currentCharacter), inputCharacters.indexOf(currentCharacter) + 1));
-        }
-
-        return stringBuilder;
+        outputTextView.setText(encrypted);
     }
 
-    /**
-     *
-     * @param userString Le string que l'utilisateur a entré
-     * @param inputCharacters Le string qui sert à déterminer quelle est la position d'un charactère
-     * @param outputCharacters Le string qui sert à remplacer des charactère selon leur position
-     * @return Retourne un string décrypté
-     */
-    private StringBuilder decrypt(String userString , String inputCharacters, String outputCharacters)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
+    @Override
+    public void onEncrypting() {
 
-        for (int i = 0; i < userString.length(); i++)
-        {
-            Character currentCharacter = userString.charAt(i);
+    }
 
-            stringBuilder.append(inputCharacters.substring(outputCharacters.indexOf(currentCharacter), outputCharacters.indexOf(currentCharacter) + 1));
-        }
+    @Override
+    public void onDecrypted(StringBuilder decrypted) {
+        outputTextView.setText(decrypted);
+    }
 
-        return stringBuilder;
+    @Override
+    public void onDecrypting() {
+
     }
 }
