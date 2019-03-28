@@ -154,13 +154,13 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     private void onEncryptButtonPressed(View view) {
-        EncryptTask encrypt = new EncryptTask(this, /*inputEditText.getText().toString(),*/ inputCharacters, outputCharacters);
+        EncryptTask encrypt = new EncryptTask(this, inputCharacters, outputCharacters);
 
         outputTextView.setText(encrypt.execute(inputEditText.getText().toString()).toString());
     }
 
     private void onDecryptButtonPressed(View view) {
-        DecryptTask decrypt = new DecryptTask(this, /*inputEditText.getText().toString(),*/ inputCharacters, outputCharacters);
+        DecryptTask decrypt = new DecryptTask(this, inputCharacters, outputCharacters);
 
         outputTextView.setText(decrypt.execute(inputEditText.getText().toString()).toString());
     }
