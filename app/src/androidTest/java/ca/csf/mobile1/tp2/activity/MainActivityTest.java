@@ -205,9 +205,9 @@ public class MainActivityTest extends BaseActivityTest {
         changeInputTextTo("Bonjour madame.");
 
         pressEncryptButton();
-        checkOutputIs("");
+        checkOutputIs(R.string.hint_output_text);
         pressDecryptButton();
-        checkOutputIs("");
+        checkOutputIs(R.string.hint_output_text);
     }
 
     @Test
@@ -294,6 +294,10 @@ public class MainActivityTest extends BaseActivityTest {
 
     private void checkInputIs(String text) {
         onView(withId(R.id.inputEditText)).check(matches(withText(text)));
+    }
+
+    private void checkOutputIs(@StringRes int text) {
+        onView(withId(R.id.outputTextView)).check(matches(withText(text)));
     }
 
     private void checkOutputIs(String text) {
