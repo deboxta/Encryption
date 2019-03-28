@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
     }
 
-    /
     private void restoreVariables(Bundle savedInstanceState){
         inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
         outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
@@ -115,8 +114,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         copyButton.setOnClickListener(this::onCopyButtonPressed);
         encryptButton.setOnClickListener(this::onEncryptButtonPressed);
         decryptButton.setOnClickListener(this::onDecryptButtonPressed);
-        encryptButton.setEnabled(false);
-        decryptButton.setEnabled(false);
+        deactivateButtons();
         progressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -175,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * Permet
      */
     private void openKeyPickerDialog() {
-        //TODO : Compléter la création et l'ouverture du "KeyPickerDialog" dans cette fonction.
         KeyPickerDialog.make(this, KEY_LENGTH)
                 .setKey(key)
                 .setConfirmAction(this::theConfirmFunctionToCall)
@@ -189,6 +186,12 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         keySelected = true;
     }
 
+    private void theCancelFunctionToCall() {
+        keyPickerDialogueIsOpen = false;
+        if (intent.getType() != null && keySelected == false)
+            finish();
+    }
+
     private void keyFetchingActivation(Integer key){
         FetchKeyAsyncTask taskGetKey = new FetchKeyAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
@@ -200,14 +203,17 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
 
         keyPickerDialogueIsOpen = false;
 
-        decryptButton.setEnabled(true);
-        encryptButton.setEnabled(true);
+        activateButtons();
     }
 
-    private void theCancelFunctionToCall() {
-        keyPickerDialogueIsOpen = false;
-        if (intent.getType() != null && keySelected == false)
-            finish();
+    private void deactivateButtons(){
+        decryptButton.setEnabled(false);
+        encryptButton.setEnabled(false);
+    }
+
+    private void activateButtons(){
+        decryptButton.setEnabled(true);
+        encryptButton.setEnabled(true);
     }
 
     private void putKeyOnCurrentKeyTextView(Integer key){
@@ -227,8 +233,6 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
 
     private void onConnectivityError(){
         Snackbar.make(rootView,R.string.text_connectivity_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.text_activate_wifi, this::activateWifi).show();
-        decryptButton.setEnabled(false);
-        encryptButton.setEnabled(false);
     }
 
     private void onServerError(){
@@ -270,9 +274,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     @Override
-    public void onEncrypting() {
-        progressBar.setVisibility(View.VISIBLE);
-    }
+    public void onEncrypting() { progressBar.setVisibility(View.VISIBLE); }
 
     @Override
     public void onDecrypted(StringBuilder decrypted)
@@ -282,7 +284,5 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     @Override
-    public void onDecrypting() {
-        progressBar.setVisibility(View.VISIBLE);
-    }
+    public void onDecrypting() { progressBar.setVisibility(View.VISIBLE); }
 }
