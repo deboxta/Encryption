@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     private Random rand;
     private String inputCharacters;
     private String outputCharacters;
+
     private boolean keySelected;
+    private boolean keyPickerDialogueIsOpen;
 
     private View rootView;
     private EditText inputEditText;
@@ -59,16 +61,30 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         createDependencies();
         setVariables();
 
-        rand = new Random();
-        key = rand.nextInt(MAX_KEY_VALUE);
-        keySelected = false;
+        if (savedInstanceState != null){
+            inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
+            outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
+            currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
+            encryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+            decryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+            keySelected = savedInstanceState.getBoolean("CURRENT_KEY_SELECTED");
+            key = savedInstanceState.getInt("CURRENT_KEY");
+            keyPickerDialogueIsOpen = savedInstanceState.getBoolean("CURRENT_KEY_PICKER");
+            if (keyPickerDialogueIsOpen){
+                openKeyPickerDialog();
+            }
+        } else {
+            rand = new Random();
+            key = rand.nextInt(MAX_KEY_VALUE);
+            keySelected = false;
+            keyPickerDialogueIsOpen = false;
+            keyFetchingActivation(key);
+        }
         inputCharacters = null;
         outputCharacters = null;
 
-        keyFetchingActivation(key);
-
         intent = getIntent();
-        if("text/plain".equals(intent.getType())) {
+        if("text/plain".equals(intent.getType())&& keySelected == false) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
             openKeyPickerDialog();
         }
@@ -80,16 +96,10 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         outState.putString("CURRENT_INPUT", inputEditText.getText().toString());
         outState.putString("CURRENT_OUTPUT",outputTextView.getText().toString());
         outState.putString("CURRENT_KEY_TEXT", currentKeyTextView.getText().toString());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
-        outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
-        currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
-
-        openKeyPickerDialog();
+        outState.putInt("CURRENT_KEY", key);
+        outState.putBoolean("CURRENT_KEY_PICKER", keyPickerDialogueIsOpen);
+        outState.putBoolean("CURRENT_BUTTONS_STATE", encryptButton.isEnabled());
+        outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
     }
 
     /**
@@ -166,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
                 .setConfirmAction(this::theConfirmFunctionToCall)
                 .setCancelAction(this::theCancelFunctionToCall)
                 .show();
+        keyPickerDialogueIsOpen = true;
     }
 
     private void theConfirmFunctionToCall(Integer key) {
@@ -182,11 +193,14 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
 
         putKeyOnCurrentKeyTextView(key);
 
+        keyPickerDialogueIsOpen = false;
+
         decryptButton.setEnabled(true);
         encryptButton.setEnabled(true);
     }
 
     private void theCancelFunctionToCall() {
+        keyPickerDialogueIsOpen = false;
         if (intent.getType() != null && keySelected == false)
             finish();
     }
@@ -206,7 +220,11 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         Snackbar.make(rootView,R.string.error_not_found, Snackbar.LENGTH_LONG).show();
     }
 
-    private void onConnectivityError(){ Snackbar.make(rootView,R.string.text_connectivity_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.text_activate_wifi, this::activateWifi).show(); }
+    private void onConnectivityError(){
+        Snackbar.make(rootView,R.string.text_connectivity_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.text_activate_wifi, this::activateWifi).show();
+        decryptButton.setEnabled(false);
+        encryptButton.setEnabled(false);
+    }
 
     private void onServerError(){
         Snackbar.make(rootView,R.string.text_server_error, Snackbar.LENGTH_LONG).show();
