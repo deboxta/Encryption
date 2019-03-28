@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
     }
 
-    /
+
     private void restoreVariables(Bundle savedInstanceState){
         inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
         outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     private void onEncryptButtonPressed(View view) {
-        EncryptTask encrypt = new EncryptTask(this, inputEditText.getText().toString(), inputCharacters, outputCharacters);
+        EncryptTask encrypt = new EncryptTask(this, /*inputEditText.getText().toString(),*/ inputCharacters, outputCharacters);
 
         encrypt.execute(inputEditText.getText().toString());
 
