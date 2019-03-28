@@ -191,21 +191,24 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     @Override
     public void onEncrypted(StringBuilder encrypted)
     {
+        progressBar.setVisibility(View.INVISIBLE);
         outputTextView.setText(encrypted);
     }
 
     @Override
     public void onEncrypting() {
-
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onDecrypted(StringBuilder decrypted) {
+    public void onDecrypted(StringBuilder decrypted)
+    {
+        progressBar.setVisibility(View.INVISIBLE);
         outputTextView.setText(decrypted);
     }
 
     @Override
     public void onDecrypting() {
-
+        progressBar.setVisibility(View.VISIBLE);
     }
 }
