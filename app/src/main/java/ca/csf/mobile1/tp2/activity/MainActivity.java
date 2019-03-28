@@ -25,10 +25,11 @@ import java.util.Random;
 
 import static org.koin.java.standalone.KoinJavaComponent.get;
 
-public class MainActivity extends AppCompatActivity implements FetchPostAsyncTask.Listener, EncryptTask.Listener, DecryptTask.Listener{
+public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask.Listener, EncryptTask.Listener, DecryptTask.Listener{
 
     private static final int KEY_LENGTH = 5;
     private static final int MAX_KEY_VALUE = (int) Math.pow(10, KEY_LENGTH) - 1;
+    public static final String INIT_KEY_VALUE = "%05d";
 
     private OkHttpClient okHttpClient;
     private ObjectMapper objectMapper;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     private Random rand;
     private String inputCharacters;
     private String outputCharacters;
+    private boolean keySelected;
 
     private View rootView;
     private EditText inputEditText;
@@ -59,8 +61,11 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
 
         rand = new Random();
         key = rand.nextInt(MAX_KEY_VALUE);
+        keySelected = false;
         inputCharacters = null;
         outputCharacters = null;
+
+        keyFetchingActivation(key);
 
         intent = getIntent();
         if("text/plain".equals(intent.getType())) {
@@ -69,6 +74,27 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("CURRENT_INPUT", inputEditText.getText().toString());
+        outState.putString("CURRENT_OUTPUT",outputTextView.getText().toString());
+        outState.putString("CURRENT_KEY_TEXT", currentKeyTextView.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
+        outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
+        currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
+
+        openKeyPickerDialog();
+    }
+
+    /**
+     * Permet de set toutes les variables qui en ont besoin
+     */
     private void setVariables(){
         selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
         copyButton.setOnClickListener(this::onCopyButtonPressed);
@@ -79,11 +105,17 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    /**
+     * Création des variables de connection server qui sont passées à la tâche async
+     */
     private void createDependencies() {
         okHttpClient = get(OkHttpClient.class);
         objectMapper = get(ObjectMapper.class);
     }
 
+    /**
+     * Crée la view de notre application en associant les variables
+     */
     private void createView() {
         setContentView(R.layout.activity_main);
 
@@ -124,6 +156,9 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         outputTextView.setText(decrypt.doInBackground());
     }
 
+    /**
+     * Permet
+     */
     private void openKeyPickerDialog() {
         //TODO : Compléter la création et l'ouverture du "KeyPickerDialog" dans cette fonction.
         KeyPickerDialog.make(this, KEY_LENGTH)
@@ -134,7 +169,12 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void theConfirmFunctionToCall(Integer key) {
-        FetchPostAsyncTask taskGetKey = new FetchPostAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
+        keyFetchingActivation(key);
+        keySelected = true;
+    }
+
+    private void keyFetchingActivation(Integer key){
+        FetchKeyAsyncTask taskGetKey = new FetchKeyAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
         taskGetKey.execute(key.toString());
 
@@ -147,13 +187,13 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
     }
 
     private void theCancelFunctionToCall() {
-        if (intent.getType() != null && currentKeyTextView.getText().equals(""))
+        if (intent.getType() != null && keySelected == false)
             finish();
     }
 
     private void putKeyOnCurrentKeyTextView(Integer key){
         currentKeyTextView.setText(R.string.text_current_key);
-        currentKeyTextView.setText(currentKeyTextView.getText().toString().replace("%05d",key.toString()));
+        currentKeyTextView.setText(currentKeyTextView.getText().toString().replace(INIT_KEY_VALUE,key.toString()));
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -172,11 +212,19 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         Snackbar.make(rootView,R.string.text_server_error, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * Permet d'accèder aux paramêtres wifi
+     * @param view La view principale
+     */
     private void activateWifi(View view){
         progressBar.setVisibility(View.INVISIBLE);
         startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
     }
 
+    /**
+     * Opérations à effectuer une fois la clé obtenue
+     * @param postKeyInfo La clé JSON en format object qui contient les informations de la clé
+     */
     @Override
     public void onPostFetched(KeyFromServer postKeyInfo) {
         progressBar.setVisibility(View.INVISIBLE);
@@ -185,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements FetchPostAsyncTas
         key = postKeyInfo.getId();
     }
 
+    /**
+     * Operations a effectuer lors de l'obtention de la clé
+     */
     @Override
     public void onPostFetching() { progressBar.setVisibility(View.VISIBLE); }
 

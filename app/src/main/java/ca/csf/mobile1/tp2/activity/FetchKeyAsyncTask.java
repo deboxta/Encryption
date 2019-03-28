@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-    public class FetchPostAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
+    public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
 
     private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/"; /*http://192.168.1.15:8080/api/v1/key/*/ /*"http://10.17.59.14:8080/api/v1/key/"*/;
 
@@ -31,7 +31,7 @@ import java.util.List;
     private final Runnable onConnectivityError;
     private final Runnable onServerError;
 
-    public FetchPostAsyncTask(Listener onSuccess, Runnable onNotFoundError, Runnable onConnectivityError, Runnable onServerError, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
+    public FetchKeyAsyncTask(Listener onSuccess, Runnable onNotFoundError, Runnable onConnectivityError, Runnable onServerError, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
 
         if (onSuccess == null) throw new IllegalArgumentException("onSuccess cannot be null");
         if (onNotFoundError == null) throw new IllegalArgumentException("onNotFoundError cannot be null");
@@ -53,8 +53,6 @@ import java.util.List;
 
     @Override
     protected KeyFromServer doInBackground(String... key) {
-        if(android.os.Debug.isDebuggerConnected())
-            android.os.Debug.waitForDebugger();
 
         Request request = new Request.Builder().url(POST_HTTP+key[0]).build();
 
