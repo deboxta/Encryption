@@ -62,17 +62,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         setVariables();
 
         if (savedInstanceState != null){
-            inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
-            outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
-            currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
-            encryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
-            decryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
-            keySelected = savedInstanceState.getBoolean("CURRENT_KEY_SELECTED");
-            key = savedInstanceState.getInt("CURRENT_KEY");
-            keyPickerDialogueIsOpen = savedInstanceState.getBoolean("CURRENT_KEY_PICKER");
-            if (keyPickerDialogueIsOpen){
-                openKeyPickerDialog();
-            }
+            restoreVariables(savedInstanceState);
         } else {
             rand = new Random();
             key = rand.nextInt(MAX_KEY_VALUE);
@@ -100,6 +90,21 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         outState.putBoolean("CURRENT_KEY_PICKER", keyPickerDialogueIsOpen);
         outState.putBoolean("CURRENT_BUTTONS_STATE", encryptButton.isEnabled());
         outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
+    }
+
+    /
+    private void restoreVariables(Bundle savedInstanceState){
+        inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
+        outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
+        currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
+        encryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+        decryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+        keySelected = savedInstanceState.getBoolean("CURRENT_KEY_SELECTED");
+        key = savedInstanceState.getInt("CURRENT_KEY");
+        keyPickerDialogueIsOpen = savedInstanceState.getBoolean("CURRENT_KEY_PICKER");
+        if (keyPickerDialogueIsOpen){
+            openKeyPickerDialog();
+        }
     }
 
     /**
