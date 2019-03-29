@@ -1,4 +1,4 @@
-package ca.csf.mobile1.tp2.activity;
+package ca.csf.mobile1.tp2.activity.Crypt;
 
 import android.os.AsyncTask;
 import ca.csf.mobile1.tp2.modele.Encrypt;
@@ -33,10 +33,7 @@ public class EncryptTask extends AsyncTask<String, Void, StringBuilder>
     @Override
     protected StringBuilder doInBackground(String... userString)
     {
-        if (inputCharacters != null && outputCharacters != null){
-            return Encrypt.INSTANCE.encrypt(userString[0], inputCharacters, outputCharacters);
-        }
-        return NULL_RETURN;
+        return Encrypt.INSTANCE.encrypt(userString[0], inputCharacters, outputCharacters);
     }
 
     @Override

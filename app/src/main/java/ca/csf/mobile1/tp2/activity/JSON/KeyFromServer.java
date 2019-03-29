@@ -1,4 +1,4 @@
-package ca.csf.mobile1.tp2.activity;
+package ca.csf.mobile1.tp2.activity.JSON;
 
 
 public class KeyFromServer {

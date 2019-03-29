@@ -1,5 +1,6 @@
 package ca.csf.mobile1.tp2.activity;
 
+import ca.csf.mobile1.tp2.activity.Crypt.DecryptTask;
 import ca.csf.mobile1.tp2.modele.Decrypt;
 import org.junit.Before;
 import org.junit.Test;

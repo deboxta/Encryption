@@ -1,9 +1,8 @@
-package ca.csf.mobile1.tp2.activity;
+package ca.csf.mobile1.tp2.activity.Server;
 
 import android.os.AsyncTask;
-import android.os.AsyncTask;
+import ca.csf.mobile1.tp2.activity.JSON.KeyFromServer;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
@@ -12,10 +11,8 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.security.PrivilegedAction;
-import java.util.List;
 
-    public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
+public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
 
     private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/"; /*"http://192.168.1.15:8080/api/v1/key/";*/ /*"http://10.17.60.75:8080/api/v1/key/"*/
 

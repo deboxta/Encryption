@@ -1,4 +1,4 @@
-package ca.csf.mobile1.tp2.activity;
+package ca.csf.mobile1.tp2.activity.Crypt;
 
 import android.os.AsyncTask;
 import ca.csf.mobile1.tp2.modele.Decrypt;
@@ -14,7 +14,6 @@ public class DecryptTask extends AsyncTask<String, Void, StringBuilder>
     /**
      *
      * @param listener ce qui veut être averti du résultat
-     * @param userString Le string que l'utilisateur a entré
      * @param inputCharacters Le string qui sert à déterminer quelle est la position d'un charactère
      * @param outputCharacters Le string qui sert à remplacer des charactère selon leur position
      */

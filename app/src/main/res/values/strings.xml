@@ -16,4 +16,5 @@
     <string name="text_activate_wifi">Activate Wifi</string>
 
     <string name="clipboard_encrypted_text">Encrypted text</string>
+    <string name="text_no_text_input">You need to enter text first!</string>
 </resources>

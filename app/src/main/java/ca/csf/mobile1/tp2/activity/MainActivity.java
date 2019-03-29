@@ -14,13 +14,15 @@ import android.text.InputFilter;
 import android.view.View;
 import android.widget.*;
 import ca.csf.mobile1.tp2.R;
+import ca.csf.mobile1.tp2.activity.Crypt.DecryptTask;
+import ca.csf.mobile1.tp2.activity.Crypt.EncryptTask;
+import ca.csf.mobile1.tp2.activity.JSON.KeyFromServer;
+import ca.csf.mobile1.tp2.activity.Server.FetchKeyAsyncTask;
 import ca.csf.mobile1.util.view.CharactersFilter;
 import ca.csf.mobile1.util.view.KeyPickerDialog;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 import static org.koin.java.standalone.KoinJavaComponent.get;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     private static final int KEY_LENGTH = 5;
     private static final int MAX_KEY_VALUE = (int) Math.pow(10, KEY_LENGTH) - 1;
     public static final String INIT_KEY_VALUE = "%05d";
+    public static final String STRING_NULL = "";
 
     private OkHttpClient okHttpClient;
     private ObjectMapper objectMapper;
@@ -154,15 +157,30 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     private void onEncryptButtonPressed(View view) {
-        EncryptTask encrypt = new EncryptTask(this, inputCharacters, outputCharacters);
+        try{
+            EncryptTask encrypt = new EncryptTask(this, inputCharacters, outputCharacters);
+            if (!inputEditText.getText().toString().equals(STRING_NULL)){
+                outputTextView.setText(encrypt.execute(inputEditText.getText().toString()).toString());
+            } else {
+                Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
+            }
+        } catch (Exception e){
 
-        outputTextView.setText(encrypt.execute(inputEditText.getText().toString()).toString());
+        }
     }
 
     private void onDecryptButtonPressed(View view) {
-        DecryptTask decrypt = new DecryptTask(this, inputCharacters, outputCharacters);
+        try{
+            DecryptTask decrypt = new DecryptTask(this, inputCharacters, outputCharacters);
 
-        outputTextView.setText(decrypt.execute(inputEditText.getText().toString()).toString());
+            if (!inputEditText.getText().toString().equals(STRING_NULL)){
+                outputTextView.setText(decrypt.execute(inputEditText.getText().toString()).toString());
+            } else {
+                Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
+            }
+        } catch (Exception e){
+
+        }
     }
 
     /**
