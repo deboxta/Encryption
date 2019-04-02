@@ -5,6 +5,7 @@ import ca.csf.mobile1.tp2.modele.Decrypt;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -24,6 +25,12 @@ public class DecryptTaskTest
         outputCharacters = "xTHIaqZOXVzvSMRLhmB ldesKNnQrpDoigWb.GUEwCfPkAJtFcyujY";
 
         exceptionWasThrown = false;
+    }
+
+    @Test
+    public void validateTestResultOk01()
+    {
+        assertTrue(Decrypt.INSTANCE.decrypt("x", inputCharacters, outputCharacters).equals("a"));
     }
 
     @Test
