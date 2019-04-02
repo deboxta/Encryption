@@ -64,25 +64,24 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         createDependencies();
         setVariables();
 
+        //Afin de différencier s'il s'agit d'un début d'application suite à un changement d'orientation ou non
         if (savedInstanceState != null){
             restoreVariables(savedInstanceState);
         } else {
-            rand = new Random();
-            key = rand.nextInt(MAX_KEY_VALUE);
-            keySelected = false;
-            keyPickerDialogueIsOpen = false;
-            keyFetchingActivation(key);
+            normalStartUpSettings();
         }
-        inputCharacters = null;
-        outputCharacters = null;
 
         intent = getIntent();
-        if("text/plain".equals(intent.getType())&& keySelected == false) {
+        if("text/plain".equals(intent.getType())&& !keySelected) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
             openKeyPickerDialog();
         }
     }
 
+    /**
+     * Sauveguarde toutes les données utiles lors du changement d'orientation pour plus tard
+     * @param outState variable de sauveguarde qui contient les informations de sauveguarde
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -93,8 +92,14 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         outState.putBoolean("CURRENT_KEY_PICKER", keyPickerDialogueIsOpen);
         outState.putBoolean("CURRENT_BUTTONS_STATE", encryptButton.isEnabled());
         outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
+        outState.putString("CURRENT_INPUT_CHARACTERS", inputCharacters);
+        outState.putString("CURRENT_OUTPUT_CHARACTERS", outputCharacters);
     }
 
+    /**
+     * Restaure les données importantes lors du changement de d'orientation
+     * @param savedInstanceState Contient les sauveguardes de toutes les données
+     */
     private void restoreVariables(Bundle savedInstanceState){
         inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
         outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
@@ -102,11 +107,26 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         encryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
         decryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
         keySelected = savedInstanceState.getBoolean("CURRENT_KEY_SELECTED");
+        inputCharacters = savedInstanceState.getString("CURRENT_INPUT_CHARACTERS");
+        outputCharacters = savedInstanceState.getString("CURRENT_OUTPUT_CHARACTERS");
         key = savedInstanceState.getInt("CURRENT_KEY");
         keyPickerDialogueIsOpen = savedInstanceState.getBoolean("CURRENT_KEY_PICKER");
         if (keyPickerDialogueIsOpen){
             openKeyPickerDialog();
         }
+    }
+
+    /**
+     * Initialise les variables lors de démarrage de l'application normal
+     */
+    private void normalStartUpSettings() {
+        rand = new Random();
+        key = rand.nextInt(MAX_KEY_VALUE);
+        keySelected = false;
+        keyPickerDialogueIsOpen = false;
+        keyFetchingActivation(key);
+        inputCharacters = null;
+        outputCharacters = null;
     }
 
     /**
@@ -156,6 +176,10 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         Snackbar.make(rootView,R.string.text_copied_output, BaseTransientBottomBar.LENGTH_LONG).show();
     }
 
+    /**
+     * Fait appel aux classes d'encryption pour effectuer le calcul seulement s'il y a du texte
+     * @param view la vue
+     */
     private void onEncryptButtonPressed(View view) {
         try{
             EncryptTask encrypt = new EncryptTask(this, inputCharacters, outputCharacters);
@@ -165,10 +189,14 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
                 Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
             }
         } catch (Exception e){
-
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Fait appel aux classes de décryption pour effectuer le calcul seulement s'il y a du texte
+     * @param view La vue actuelle
+     */
     private void onDecryptButtonPressed(View view) {
         try{
             DecryptTask decrypt = new DecryptTask(this, inputCharacters, outputCharacters);
@@ -179,13 +207,10 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
                 Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
             }
         } catch (Exception e){
-
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Permet
-     */
     private void openKeyPickerDialog() {
         KeyPickerDialog.make(this, KEY_LENGTH)
                 .setKey(key)
@@ -195,17 +220,29 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         keyPickerDialogueIsOpen = true;
     }
 
+    /**
+     * Appelée par la boite de dialogue de clé lorsque la clé est choisie
+     * @param key La clé entrée en paramêtre
+     */
     private void theConfirmFunctionToCall(Integer key) {
         keyFetchingActivation(key);
         keySelected = true;
     }
 
+    /**
+     * Appelée par la boite de dialogue de clé lorsque le choix est annulé
+     */
     private void theCancelFunctionToCall() {
         keyPickerDialogueIsOpen = false;
-        if (intent.getType() != null && keySelected == false)
+        //Utile pour le cas ou l'Application aurait été ouverte par partage
+        if (intent.getType() != null && !keySelected)
             finish();
     }
 
+    /**
+     * Fait appel à la classe de connection au serveur afin d'Aller chercher les informations de la clé
+     * @param key La clé qui à préalablement été choisie au hazard ou manuellement
+     */
     private void keyFetchingActivation(Integer key){
         FetchKeyAsyncTask taskGetKey = new FetchKeyAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
@@ -220,16 +257,6 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         activateButtons();
     }
 
-    private void deactivateButtons(){
-        decryptButton.setEnabled(false);
-        encryptButton.setEnabled(false);
-    }
-
-    private void activateButtons(){
-        decryptButton.setEnabled(true);
-        encryptButton.setEnabled(true);
-    }
-
     private void putKeyOnCurrentKeyTextView(Integer key){
         currentKeyTextView.setText(R.string.text_current_key);
         currentKeyTextView.setText(currentKeyTextView.getText().toString().replace(INIT_KEY_VALUE,key.toString()));
@@ -239,6 +266,16 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     private void putTextInClipboard(String text) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newPlainText(getResources().getString(R.string.clipboard_encrypted_text), text));
+    }
+
+    private void deactivateButtons(){
+        decryptButton.setEnabled(false);
+        encryptButton.setEnabled(false);
+    }
+
+    private void activateButtons(){
+        decryptButton.setEnabled(true);
+        encryptButton.setEnabled(true);
     }
 
     private void onNotFoundError(){

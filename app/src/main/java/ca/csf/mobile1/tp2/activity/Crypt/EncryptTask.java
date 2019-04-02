@@ -5,8 +5,6 @@ import ca.csf.mobile1.tp2.modele.Encrypt;
 
 public class EncryptTask extends AsyncTask<String, Void, StringBuilder>
 {
-    public static final StringBuilder NULL_RETURN = new StringBuilder().append("");
-
     private String inputCharacters;
     private String outputCharacters;
 

@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 
 public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
 
-    private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/"; /*"http://192.168.1.15:8080/api/v1/key/";*/ /*"http://10.17.60.75:8080/api/v1/key/"*/
+    private static final String POST_HTTP = "https://m1t2.blemelin.tk/api/v1/key/";
 
     private boolean isServerError;
     private boolean isNotFoundError;
@@ -48,6 +48,11 @@ public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
         this.onServerError = onServerError;
     }
 
+    /**
+     * Utilise la clé fournie en paramêtre pour aller chercher ses informations sur le server suite à la connection
+     * @param key La clé qui permet d'aller chercher les informations d'Encryptage
+     * @return L'objet de la clé JSON
+     */
     @Override
     protected KeyFromServer doInBackground(String... key) {
 
@@ -60,9 +65,14 @@ public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
             }else if (!response.isSuccessful()){
                 isServerError = true;
             }else{
-                String responseBody = response.body().string();
-
-                postKeyInfo = objectMapper.readValue(responseBody, KeyFromServer.class);
+                try{
+                    if (response.body() != null){
+                        String responseBody = response.body().string();
+                        postKeyInfo = objectMapper.readValue(responseBody, KeyFromServer.class);
+                    }
+                }catch(NullPointerException e){
+                    e.printStackTrace();
+                }
             }
         } catch (JsonParseException | JsonMappingException e){
             e.printStackTrace();
