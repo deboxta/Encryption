@@ -26,6 +26,15 @@ public class EncryptTaskTest
     }
 
     @Test
+    public void validateTestResultOk01()
+    {
+        assertTrue(Encrypt.INSTANCE.encrypt("a", inputCharacters, outputCharacters).toString().equals("x"));
+        assertTrue(Encrypt.INSTANCE.encrypt("bcd", inputCharacters, outputCharacters).toString().equals("THI"));
+        assertTrue(Encrypt.INSTANCE.encrypt(" ", inputCharacters, outputCharacters).toString().equals("j"));
+        assertTrue(Encrypt.INSTANCE.encrypt(".", inputCharacters, outputCharacters).toString().equals("Y"));
+    }
+
+    @Test
     public void validateTestCharactersOk()
     {
         try

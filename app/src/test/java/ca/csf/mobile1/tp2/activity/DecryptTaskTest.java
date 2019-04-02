@@ -30,7 +30,10 @@ public class DecryptTaskTest
     @Test
     public void validateTestResultOk01()
     {
-        assertTrue(Decrypt.INSTANCE.decrypt("x", inputCharacters, outputCharacters).equals("a"));
+        assertTrue(Decrypt.INSTANCE.decrypt("x", inputCharacters, outputCharacters).toString().equals("a"));
+        assertTrue(Decrypt.INSTANCE.decrypt("THI", inputCharacters, outputCharacters).toString().equals("bcd"));
+        assertTrue(Decrypt.INSTANCE.decrypt("j", inputCharacters, outputCharacters).toString().equals(" "));
+        assertTrue(Decrypt.INSTANCE.decrypt("Y", inputCharacters, outputCharacters).toString().equals("."));
     }
 
     @Test
