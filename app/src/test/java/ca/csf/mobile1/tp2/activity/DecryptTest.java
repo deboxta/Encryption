@@ -1,16 +1,14 @@
 package ca.csf.mobile1.tp2.activity;
 
-import ca.csf.mobile1.tp2.activity.Crypt.EncryptTask;
-import ca.csf.mobile1.tp2.modele.Encrypt;
+import ca.csf.mobile1.tp2.modele.Decrypt;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class EncryptTaskTest
+public class DecryptTest
 {
-    private EncryptTask encryptTask;
-
     private String inputCharacters;
     private String outputCharacters;
 
@@ -28,10 +26,10 @@ public class EncryptTaskTest
     @Test
     public void validateTestResultOk01()
     {
-        assertTrue(Encrypt.INSTANCE.encrypt("a", inputCharacters, outputCharacters).toString().equals("x"));
-        assertTrue(Encrypt.INSTANCE.encrypt("bcd", inputCharacters, outputCharacters).toString().equals("THI"));
-        assertTrue(Encrypt.INSTANCE.encrypt(" ", inputCharacters, outputCharacters).toString().equals("j"));
-        assertTrue(Encrypt.INSTANCE.encrypt(".", inputCharacters, outputCharacters).toString().equals("Y"));
+        assertTrue(Decrypt.INSTANCE.decrypt("x", inputCharacters, outputCharacters).toString().equals("a"));
+        assertTrue(Decrypt.INSTANCE.decrypt("THI", inputCharacters, outputCharacters).toString().equals("bcd"));
+        assertTrue(Decrypt.INSTANCE.decrypt("j", inputCharacters, outputCharacters).toString().equals(" "));
+        assertTrue(Decrypt.INSTANCE.decrypt("Y", inputCharacters, outputCharacters).toString().equals("."));
     }
 
     @Test
@@ -39,15 +37,15 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("Bonjour les pommes", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("a", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("A", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("  ", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("AWDAWD", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("awdawd", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("pasdespace", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("qe", inputCharacters, outputCharacters);
-            Encrypt.INSTANCE.encrypt("..", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("Bonjour les pommes", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("a", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("A", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("  ", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("AWDAWD", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("awdawd", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("pasdespace", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("qe", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("..", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -64,7 +62,7 @@ public class EncryptTaskTest
 
         try
         {
-            Encrypt.INSTANCE.encrypt(userStringToTest, inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt(userStringToTest, inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -79,7 +77,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("Bonjour lé pommes", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("Bonjour lé pommes", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -94,7 +92,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("Bonjour_le pommes", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("Bonjour_le pommes", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -109,7 +107,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("Bonjour , pommes", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("Bonjour , pommes", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -124,7 +122,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("Bonjour le 1ommes", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("Bonjour le 1ommes", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -139,7 +137,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt("", inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt("", inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
@@ -154,7 +152,7 @@ public class EncryptTaskTest
     {
         try
         {
-            Encrypt.INSTANCE.encrypt(null, inputCharacters, outputCharacters);
+            Decrypt.INSTANCE.decrypt(null, inputCharacters, outputCharacters);
         }
         catch (Exception e)
         {
