@@ -19,7 +19,7 @@ public class DecryptTaskTest
     private boolean exceptionWasThrown;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         inputCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .";
         outputCharacters = "xTHIaqZOXVzvSMRLhmB ldesKNnQrpDoigWb.GUEwCfPkAJtFcyujY";

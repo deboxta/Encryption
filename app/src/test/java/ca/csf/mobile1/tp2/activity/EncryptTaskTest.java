@@ -17,7 +17,7 @@ public class EncryptTaskTest
     private boolean exceptionWasThrown;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         inputCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .";
         outputCharacters = "xTHIaqZOXVzvSMRLhmB ldesKNnQrpDoigWb.GUEwCfPkAJtFcyujY";
