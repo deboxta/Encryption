@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     /**
-     * Sauveguarde toutes les données utiles lors du changement d'orientation pour plus tard
-     * @param outState variable de sauveguarde qui contient les informations de sauveguarde
+     * Sauveguarde toutes les données utilées lors du changement d'orientation pour plus tard
+     * @param outState variable de sauveguarde qui contient les informations à sauveguarde
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     }
 
     /**
-     * Restaure les données importantes lors du changement de d'orientation
+     * Restore les données importantes lors du changement de d'orientation
      * @param savedInstanceState Contient les sauveguardes de toutes les données
      */
     private void restoreVariables(Bundle savedInstanceState){
