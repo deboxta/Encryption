@@ -1,8 +1,12 @@
 package ca.csf.mobile1.tp2.modele;
 
+//BEN_CORRECTION : Doc manquante pour l'enum.
+
 public enum  Encrypt
 {
     INSTANCE;
+
+    //BEN_CORRECTION : Doc imcomplète pour cette fonction.
 
     /**
      *
@@ -22,6 +26,7 @@ public enum  Encrypt
 
         for (int i = 0; i < userString.length(); i++)
         {
+            //BEN_CORRECTION : Warning ignoré.
             Character currentCharacter = userString.charAt(i);
 
             stringBuilder.append(outputCharacters.substring(inputCharacters.indexOf(currentCharacter), inputCharacters.indexOf(currentCharacter) + 1));

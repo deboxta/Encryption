@@ -1,14 +1,22 @@
 package ca.csf.mobile1.tp2.activity.Crypt;
 
+//BEN_CORRECTION : Découpage en packages bien, mais nommage incorrect (lower.dot.case, pas mixed.Dot.case).
+
 import android.os.AsyncTask;
 import ca.csf.mobile1.tp2.modele.Decrypt;
 
+//BEN_REVIEW : Je trouve étrange que votre taĉhe Async produise un "StringBuilder" au lieu d'une String.
+
 public class DecryptTask extends AsyncTask<String, Void, StringBuilder>
 {
+    //BEN_CORRECTION : Erreur de conception orientée objet. Vous auriez du avoir une référence vers un objet de type
+    //                 "KeyFromServer" au lieu de le décomposer ainsi.
     private String inputCharacters;
     private String outputCharacters;
 
     private final Listener listener;
+
+    //BEN_CORRECTION : Doc imcomplète pour cette fonction.
 
     /**
      *

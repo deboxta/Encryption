@@ -1,5 +1,7 @@
 package ca.csf.mobile1.tp2.activity.JSON;
 
+//BEN_CORRECTION : Classe de la couche modèle non documentée.
+//BEN_CORRECTION : Nommage. Le "FromServer" ne sert à rien.
 
 public class KeyFromServer {
     private int id;

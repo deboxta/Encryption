@@ -1,8 +1,13 @@
 package ca.csf.mobile1.tp2.modele;
 
+//BEN_CORRECTION : Doc manquante pour l'enum.
+//BEN_REVIEW : Je comprends pas vraiment pourquoi vous n'avez pas fait qu'une seule classe qui est capable de faire les deux.
+//BEN_CORRECTION : Duplication de code.
 public enum  Decrypt
 {
     INSTANCE;
+
+    //BEN_CORRECTION : Doc imcomplète pour cette fonction.
 
     /**
      *
@@ -22,6 +27,7 @@ public enum  Decrypt
 
         for (int i = 0; i < userString.length(); i++)
         {
+            //BEN_CORRECTION : Warning ignoré.
             Character currentCharacter = userString.charAt(i);
 
             stringBuilder.append(inputCharacters.substring(outputCharacters.indexOf(currentCharacter), outputCharacters.indexOf(currentCharacter) + 1));

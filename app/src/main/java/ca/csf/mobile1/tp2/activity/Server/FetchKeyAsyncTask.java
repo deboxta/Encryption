@@ -28,6 +28,7 @@ public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
     private final Runnable onConnectivityError;
     private final Runnable onServerError;
 
+    //BEN_REVIEW : Cette ligne est un peu longue. Mettre un paramètre par ligne.
     public FetchKeyAsyncTask(Listener onSuccess, Runnable onNotFoundError, Runnable onConnectivityError, Runnable onServerError, OkHttpClient okHttpClient, ObjectMapper objectMapper) {
 
         if (onSuccess == null) throw new IllegalArgumentException("onSuccess cannot be null");
@@ -65,6 +66,7 @@ public class FetchKeyAsyncTask extends AsyncTask<String, Void, KeyFromServer> {
             }else if (!response.isSuccessful()){
                 isServerError = true;
             }else{
+                //BEN_CORRECTION : Patch. Ne jamais attraper de "NullPointerException".
                 try{
                     if (response.body() != null){
                         String responseBody = response.body().string();

@@ -38,8 +38,13 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     private ObjectMapper objectMapper;
     private Intent intent;
 
+    //BEN_CORRECTION : Usage de la classe enveloppe au lieu du type de base sans aucune raison.
     private Integer key;
+    //BEN_CORRECTION : Warning ignoré + nommage paresseux.
     private Random rand;
+
+    //BEN_CORRECTION : Erreur de conception orientée objet. Vous auriez du avoir une référence vers un objet de type
+    //                 "KeyFromServer" au lieu de le décomposer ainsi.
     private String inputCharacters;
     private String outputCharacters;
 
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         }
 
         intent = getIntent();
+        //BEN_CORRECTION : Constante manquante.
         if("text/plain".equals(intent.getType())&& !keySelected) {
             inputEditText.setText(intent.getStringExtra(Intent.EXTRA_TEXT));
             openKeyPickerDialog();
@@ -85,14 +91,23 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        //BEN_CORRECTION : Constante manquante.
         outState.putString("CURRENT_INPUT", inputEditText.getText().toString());
+        //BEN_CORRECTION : Constante manquante.
         outState.putString("CURRENT_OUTPUT",outputTextView.getText().toString());
+        //BEN_CORRECTION : Constante manquante.
         outState.putString("CURRENT_KEY_TEXT", currentKeyTextView.getText().toString());
+        //BEN_CORRECTION : Constante manquante.
         outState.putInt("CURRENT_KEY", key);
+        //BEN_CORRECTION : Constante manquante.
         outState.putBoolean("CURRENT_KEY_PICKER", keyPickerDialogueIsOpen);
+        //BEN_CORRECTION : Constante manquante.
         outState.putBoolean("CURRENT_BUTTONS_STATE", encryptButton.isEnabled());
+        //BEN_CORRECTION : Constante manquante.
         outState.putBoolean("CURRENT_KEY_SELECTED", keySelected);
+        //BEN_CORRECTION : Constante manquante.
         outState.putString("CURRENT_INPUT_CHARACTERS", inputCharacters);
+        //BEN_CORRECTION : Constante manquante.
         outState.putString("CURRENT_OUTPUT_CHARACTERS", outputCharacters);
     }
 
@@ -101,15 +116,25 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * @param savedInstanceState Contient les sauveguardes de toutes les données
      */
     private void restoreVariables(Bundle savedInstanceState){
+        //BEN_CORRECTION : Constante manquante.
         inputEditText.setText(savedInstanceState.getString("CURRENT_INPUT"));
+        //BEN_CORRECTION : Constante manquante.
         outputTextView.setText(savedInstanceState.getString("CURRENT_OUTPUT"));
+        //BEN_CORRECTION : Constante manquante.
         currentKeyTextView.setText(savedInstanceState.getString("CURRENT_KEY_TEXT"));
+        //BEN_CORRECTION : Constante manquante.
         encryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+        //BEN_CORRECTION : Constante manquante.
         decryptButton.setEnabled(savedInstanceState.getBoolean("CURRENT_BUTTONS_STATE"));
+        //BEN_CORRECTION : Constante manquante.
         keySelected = savedInstanceState.getBoolean("CURRENT_KEY_SELECTED");
+        //BEN_CORRECTION : Constante manquante.
         inputCharacters = savedInstanceState.getString("CURRENT_INPUT_CHARACTERS");
+        //BEN_CORRECTION : Constante manquante.
         outputCharacters = savedInstanceState.getString("CURRENT_OUTPUT_CHARACTERS");
+        //BEN_CORRECTION : Constante manquante.
         key = savedInstanceState.getInt("CURRENT_KEY");
+        //BEN_CORRECTION : Constante manquante.
         keyPickerDialogueIsOpen = savedInstanceState.getBoolean("CURRENT_KEY_PICKER");
         if (keyPickerDialogueIsOpen){
             openKeyPickerDialog();
@@ -132,6 +157,8 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     /**
      * Permet de set toutes les variables qui en ont besoin
      */
+    //BEN_REVIEW : J'aurais plutôt appellé cela "initializeValues" our quelque chose du genre.
+    //BEN_CORRECTION : Nomamge mensonger. Je viens de me rendre compte que cela initialise la view.
     private void setVariables(){
         selectKeyButton.setOnClickListener(this::onSelectKeyButtonPressed);
         copyButton.setOnClickListener(this::onCopyButtonPressed);
@@ -181,9 +208,14 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * @param view la vue
      */
     private void onEncryptButtonPressed(View view) {
+        //BEN_CORRECTION : Patch. Try/Catch ne devrait pas être là.
         try{
             EncryptTask encrypt = new EncryptTask(this, inputCharacters, outputCharacters);
+            //BEN_CORRECTION : Intrusion du contrôleur dans les responsabilités du modèle. C'est au modèle
+            //                 de faire ce genre de choix, pas au contrôleur.
             if (!inputEditText.getText().toString().equals(STRING_NULL)){
+                //BEN_CORRECTION : ??????
+                //                 Est-ce que vois bien ? Vous faites "toString()" sur un "AsyncTask" ?
                 outputTextView.setText(encrypt.execute(inputEditText.getText().toString()).toString());
             } else {
                 Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
@@ -198,10 +230,15 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * @param view La vue actuelle
      */
     private void onDecryptButtonPressed(View view) {
+        //BEN_CORRECTION : Patch. Try/Catch ne devrait pas être là.
         try{
             DecryptTask decrypt = new DecryptTask(this, inputCharacters, outputCharacters);
 
+            //BEN_CORRECTION : Intrusion du contrôleur dans les responsabilités du modèle. C'est au modèle
+            //                 de faire ce genre de choix, pas au contrôleur.
             if (!inputEditText.getText().toString().equals(STRING_NULL)){
+                //BEN_CORRECTION : ??????
+                //                 Est-ce que vois bien ? Vous faites "toString()" sur un "AsyncTask" ?
                 outputTextView.setText(decrypt.execute(inputEditText.getText().toString()).toString());
             } else {
                 Snackbar.make(rootView, R.string.text_no_text_input, Snackbar.LENGTH_LONG).show();
@@ -224,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * Appelée par la boite de dialogue de clé lorsque la clé est choisie
      * @param key La clé entrée en paramêtre
      */
+    //BEN_CORRECTION : Nommage pareseux, suite à un copier/coller ?
     private void theConfirmFunctionToCall(Integer key) {
         keyFetchingActivation(key);
         keySelected = true;
@@ -232,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
     /**
      * Appelée par la boite de dialogue de clé lorsque le choix est annulé
      */
+    //BEN_CORRECTION : Nommage pareseux, suite à un copier/coller ?
     private void theCancelFunctionToCall() {
         keyPickerDialogueIsOpen = false;
         //Utile pour le cas ou l'Application aurait été ouverte par partage
@@ -243,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
      * Fait appel à la classe de connection au serveur afin d'Aller chercher les informations de la clé
      * @param key La clé qui à préalablement été choisie au hazard ou manuellement
      */
+    //BEN_CORRECTION : Nommage ambigu. Il n'y a pas de verbe d'action dans le nom non plus.
     private void keyFetchingActivation(Integer key){
         FetchKeyAsyncTask taskGetKey = new FetchKeyAsyncTask(this, this::onNotFoundError, this::onConnectivityError, this::onServerError, okHttpClient, objectMapper);
 
@@ -254,10 +294,13 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
 
         keyPickerDialogueIsOpen = false;
 
+        //BEN_CORRECTION : Erreur de logique. Tu ne sais pas ce qu'il va se passer à la fin de la tâche async. Les boutons ne devrait
+        //                 pas être activés toute de suite.
         activateButtons();
     }
 
     private void putKeyOnCurrentKeyTextView(Integer key){
+        //BEN_CORRECTION : Patch. Me voir au besoin.
         currentKeyTextView.setText(R.string.text_current_key);
         currentKeyTextView.setText(currentKeyTextView.getText().toString().replace(INIT_KEY_VALUE,key.toString()));
     }
@@ -278,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements FetchKeyAsyncTask
         encryptButton.setEnabled(true);
     }
 
+    //BEN_REVIEW : Le message d'erreur n'aide pas vraiment l'utilisateur...
     private void onNotFoundError(){
         Snackbar.make(rootView,R.string.error_not_found, Snackbar.LENGTH_LONG).show();
     }
